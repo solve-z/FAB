@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:keyboard_utils_fork/keyboard_listener.dart' as k;
-import 'package:keyboard_utils_fork/keyboard_utils.dart';
+import 'package:flutter/services.dart';
 
 class AppKeyboardUtil {
   static void hide(BuildContext context) {
     FocusScope.of(context).unfocus();
     FocusScope.of(context).requestFocus(FocusNode());
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   static void show(BuildContext context, FocusNode node) {
@@ -19,8 +19,6 @@ class AppKeyboardUtil {
 }
 
 mixin KeyboardDetector<T extends StatefulWidget> on State<T> {
-  final keyboardUtils = KeyboardUtils();
-  int? subscribingId;
   bool isKeyboardOn = false;
   final bool useDefaultKeyboardDetectorInit = true;
 
@@ -38,27 +36,38 @@ mixin KeyboardDetector<T extends StatefulWidget> on State<T> {
     super.dispose();
   }
 
-  initKeyboardDetector(
-      {final Function(double)? willShowKeyboard, final Function()? willHideKeyboard}) {
-    subscribingId = keyboardUtils.add(
-        listener: k.KeyboardListener(willHideKeyboard: () {
-      if (willHideKeyboard != null) {
-        willHideKeyboard();
-      }
+  initKeyboardDetector({
+    final Function(double)? willShowKeyboard,
+    final Function()? willHideKeyboard,
+  }) {
+    // Use MediaQuery to detect keyboard visibility
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkKeyboardStatus(willShowKeyboard, willHideKeyboard);
+    });
+  }
+
+  void _checkKeyboardStatus(
+    Function(double)? willShowKeyboard,
+    Function()? willHideKeyboard,
+  ) {
+    final mediaQuery = MediaQuery.of(context);
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
+    final newKeyboardOn = keyboardHeight > 0;
+
+    if (newKeyboardOn != isKeyboardOn) {
       setState(() {
-        isKeyboardOn = false;
+        isKeyboardOn = newKeyboardOn;
       });
-    }, willShowKeyboard: (value) {
-      if (willShowKeyboard != null) {
-        willShowKeyboard(value);
+
+      if (newKeyboardOn) {
+        willShowKeyboard?.call(keyboardHeight);
+      } else {
+        willHideKeyboard?.call();
       }
-      setState(() {
-        isKeyboardOn = true;
-      });
-    }));
+    }
   }
 
   disposeKeyboardDetector() {
-    keyboardUtils.unsubscribeListener(subscribingId: subscribingId);
+    // No cleanup needed for MediaQuery-based detection
   }
 }

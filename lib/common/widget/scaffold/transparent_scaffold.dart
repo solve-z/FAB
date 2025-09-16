@@ -27,7 +27,7 @@ const FloatingActionButtonLocation _kDefaultFloatingActionButtonLocation =
 const FloatingActionButtonAnimator _kDefaultFloatingActionButtonAnimator =
     FloatingActionButtonAnimator.scaling;
 
-const Curve _standardBottomSheetCurve = standardEasing;
+const Curve _standardBottomSheetCurve = Easing.standard;
 // When the top of the BottomSheet crosses this threshold, it will start to
 // shrink the FAB and show a scrim.
 const double _kBottomSheetDominatesPercentage = 0.3;
@@ -2648,12 +2648,12 @@ class TransparentScaffoldState extends State<TransparentScaffold>
   ///
   /// The `value` parameter must not be null.
   void showBodyScrim(bool value, double opacity) {
-    if (_showBodyScrim == value && _bodyScrimColor.opacity == opacity) {
+    if (_showBodyScrim == value && _bodyScrimColor.a == opacity) {
       return;
     }
     setState(() {
       _showBodyScrim = value;
-      _bodyScrimColor = Colors.black.withOpacity(opacity);
+      _bodyScrimColor = Colors.black.withValues(alpha: opacity);
     });
   }
 

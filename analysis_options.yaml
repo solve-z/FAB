@@ -25,5 +25,25 @@ linter:
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
+    # Prevent deprecated member usage
+    deprecated_member_use: error
+    deprecated_member_use_from_same_package: error
+
+    # Enforce proper equals parameter typing
+    non_nullable_equals_parameter: error
+
+    # Prevent common coding mistakes
+    avoid_returning_null_for_void: error
+    avoid_unused_constructor_parameters: error
+    cancel_subscriptions: error
+    close_sinks: error
+
+    # Code style improvements
+    prefer_const_constructors: error
+    prefer_const_declarations: error
+    prefer_const_literals_to_create_immutables: error
+    unnecessary_const: error
+    unnecessary_new: error
+
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
